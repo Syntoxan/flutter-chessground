@@ -61,7 +61,9 @@ flutter:
     - assets/piece_sets/spatial/
     - assets/piece_sets/staunty/
     - assets/piece_sets/symmetric/
+    - assets/piece_sets/syntoxan/
     - assets/piece_sets/tatiana/
     - assets/piece_sets/totoy/
     - assets/piece_sets/xkcd/
     - assets/boards/
+    
