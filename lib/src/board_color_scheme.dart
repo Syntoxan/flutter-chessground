@@ -105,7 +105,77 @@ class ChessboardColorScheme {
       validPremoves: validPremoves ?? this.validPremoves,
     );
   }
+  static const pink = ChessboardColorScheme(
+    lightSquare: Color(0xfff4f0f0),
+    darkSquare: Color(0xffec93a6),
+    background: SolidColorChessboardBackground(
+      lightSquare: Color(0xfff4f0f0),
+      darkSquare: Color(0xffec93a6),
+    ),
+    whiteCoordBackground: SolidColorChessboardBackground(
+      lightSquare: Color(0xfff4f0f0),
+      darkSquare: Color(0xffec93a6),
+      coordinates: true,
+    ),
+    blackCoordBackground: SolidColorChessboardBackground(
+      lightSquare: Color(0xfff4f0f0),
+      darkSquare: Color(0xffec93a6),
+      coordinates: true,
+      orientation: Side.black,
+    ),
+    lastMove: HighlightDetails(solidColor: Color(0x809cc700)),
+    selected: HighlightDetails(solidColor: Color(0x6014551e)),
+    validMoves: Color(0x4014551e),
+    validPremoves: Color(0x40203085),
+  );
 
+  static const midnight = ChessboardColorScheme(
+    lightSquare: Color(0xff9aa5b8),
+    darkSquare: Color(0xff3e4a63),
+    background: SolidColorChessboardBackground(
+      lightSquare: Color(0xff9aa5b8),
+      darkSquare: Color(0xff3e4a63),
+    ),
+    whiteCoordBackground: SolidColorChessboardBackground(
+      lightSquare: Color(0xff9aa5b8),
+      darkSquare: Color(0xff3e4a63),
+      coordinates: true,
+    ),
+    blackCoordBackground: SolidColorChessboardBackground(
+      lightSquare: Color(0xff9aa5b8),
+      darkSquare: Color(0xff3e4a63),
+      coordinates: true,
+      orientation: Side.black,
+    ),
+    lastMove: HighlightDetails(solidColor: Color(0x809cc700)),
+    selected: HighlightDetails(solidColor: Color(0x6014551e)),
+    validMoves: Color(0x4014551e),
+    validPremoves: Color(0x40203085),
+  );
+
+  static const lavender = ChessboardColorScheme(
+    lightSquare: Color(0xffffffff),
+    darkSquare: Color(0xff8e7cc3),
+    background: SolidColorChessboardBackground(
+      lightSquare: Color(0xffffffff),
+      darkSquare: Color(0xff8e7cc3),
+    ),
+    whiteCoordBackground: SolidColorChessboardBackground(
+      lightSquare: Color(0xffffffff),
+      darkSquare: Color(0xff8e7cc3),
+      coordinates: true,
+    ),
+    blackCoordBackground: SolidColorChessboardBackground(
+      lightSquare: Color(0xffffffff),
+      darkSquare: Color(0xff8e7cc3),
+      coordinates: true,
+      orientation: Side.black,
+    ),
+    lastMove: HighlightDetails(solidColor: Color(0x809cc700)),
+    selected: HighlightDetails(solidColor: Color(0x6014551e)),
+    validMoves: Color(0x4014551e),
+    validPremoves: Color(0x40203085),
+  );
   static const brown = ChessboardColorScheme(
     lightSquare: Color(0xfff0d9b6),
     darkSquare: Color(0xffb58863),
