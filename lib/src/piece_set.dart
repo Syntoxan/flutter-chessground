@@ -13,6 +13,8 @@ enum PieceSet {
 
   final PieceAssets assets;
 
+  static const PieceAssets cburnettAssets = syntoxanAssets;
+
   static const PieceAssets syntoxanAssets = {
     PieceKind.blackRook: AssetImage('$_pieceSetsPath/syntoxan/bR.webp', package: 'chessground'),
     PieceKind.blackPawn: AssetImage('$_pieceSetsPath/syntoxan/bP.webp', package: 'chessground'),
