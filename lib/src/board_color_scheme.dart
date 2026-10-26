@@ -105,6 +105,32 @@ class ChessboardColorScheme {
       validPremoves: validPremoves ?? this.validPremoves,
     );
   }
+    const ChessboardColorScheme.solid({
+    required Color light,
+    required Color dark,
+  }) : this(
+         lightSquare: light,
+         darkSquare: dark,
+         background: SolidColorChessboardBackground(
+           lightSquare: light,
+           darkSquare: dark,
+         ),
+         whiteCoordBackground: SolidColorChessboardBackground(
+           lightSquare: light,
+           darkSquare: dark,
+           coordinates: true,
+         ),
+         blackCoordBackground: SolidColorChessboardBackground(
+           lightSquare: light,
+           darkSquare: dark,
+           coordinates: true,
+           orientation: Side.black,
+         ),
+         lastMove: HighlightDetails(solidColor: Color(0x809cc700)),
+         selected: HighlightDetails(solidColor: Color(0x6014551e)),
+         validMoves: Color(0x4014551e),
+         validPremoves: Color(0x40203085),
+       );
   static const pink = ChessboardColorScheme(
     lightSquare: Color(0xfff4f0f0),
     darkSquare: Color(0xffec93a6),
