@@ -17,32 +17,28 @@ class ChessboardColorScheme {
     required this.validPremoves,
   });
 
-    const ChessboardColorScheme.solid({
-    required Color light,
-    required Color dark,
-  }) : this(
-         lightSquare: light,
-         darkSquare: dark,
-         background: const SolidColorChessboardBackground(
-           lightSquare: light,
-           darkSquare: dark,
-         ),
-         whiteCoordBackground: const SolidColorChessboardBackground(
-           lightSquare: light,
-           darkSquare: dark,
-           coordinates: true,
-         ),
-         blackCoordBackground: const SolidColorChessboardBackground(
-           lightSquare: light,
-           darkSquare: dark,
-           coordinates: true,
-           orientation: Side.black,
-         ),
-         lastMove: const HighlightDetails(solidColor: Color(0x809cc700)),
-         selected: const HighlightDetails(solidColor: Color(0x6014551e)),
-         validMoves: const Color(0x4014551e),
-         validPremoves: const Color(0x40203085),
-       );
+  factory ChessboardColorScheme.solid({required Color light, required Color dark}) {
+    return ChessboardColorScheme(
+      lightSquare: light,
+      darkSquare: dark,
+      background: SolidColorChessboardBackground(lightSquare: light, darkSquare: dark),
+      whiteCoordBackground: SolidColorChessboardBackground(
+        lightSquare: light,
+        darkSquare: dark,
+        coordinates: true,
+      ),
+      blackCoordBackground: SolidColorChessboardBackground(
+        lightSquare: light,
+        darkSquare: dark,
+        coordinates: true,
+        orientation: Side.black,
+      ),
+      lastMove: const HighlightDetails(solidColor: Color(0x809cc700)),
+      selected: const HighlightDetails(solidColor: Color(0x6014551e)),
+      validMoves: const Color(0x4014551e),
+      validPremoves: const Color(0x40203085),
+    );
+  }
 
   final Color lightSquare;
   final Color darkSquare;
