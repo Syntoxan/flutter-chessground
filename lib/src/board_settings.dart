@@ -1,480 +1,338 @@
-import 'package:flutter/widgets.dart';
+import 'package:chessground/chessground.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:lichess_mobile/l10n/l10n.dart';
+import 'package:lichess_mobile/src/model/common/chess.dart';
+import 'package:lichess_mobile/src/model/settings/preferences_storage.dart';
+import 'package:lichess_mobile/src/styles/styles.dart';
+import 'package:lichess_mobile/src/utils/color_palette.dart';
+import 'package:material_ui/material_ui.dart';
 
-import 'board_color_scheme.dart';
-import 'models.dart';
-import 'piece_set.dart';
-import 'draw_shape_options.dart';
+part 'board_preferences.freezed.dart';
+part 'board_preferences.g.dart';
 
-/// Describes how moves are made on an interactive board.
-enum PieceShiftMethod {
-  /// First tap the piece to be moved, then tap the target square.
-  tapTwoSquares,
+const kBoardDefaultBrightnessFilter = 1.0;
+const kBoardDefaultHueFilter = 0.0;
 
-  /// Drag-and-drop the piece to the target square.
-  drag,
+final boardPreferencesProvider = NotifierProvider<BoardPreferences, BoardPrefs>(
+  BoardPreferences.new,
+  name: 'BoardPreferencesProvider',
+);
 
-  /// Both tap and drag are enabled.
-  either,
-}
-
-/// Describes how pieces on the board are oriented.
-enum PieceOrientationBehavior {
-  /// Pieces are always facing user (the default).
-  facingUser,
-
-  /// Opponent's pieces are upside down, for over the board play face to face.
-  opponentUpsideDown,
-
-  /// Piece orientation matches side to play, for over the board play where each user grabs the device in turn.
-  sideToPlay,
-}
-
-/// Describes the kind of drag target highlighted on the board when dragging a piece.
-enum DragTargetKind {
-  /// A circle twice the size of a board square.
-  circle,
-
-  /// A square the size of a board square.
-  square,
-
-  /// No target is shown.
-  none,
-}
-
-/// Describes the border of the board.
-@immutable
-class BoardBorder {
-  /// Creates a new border with the provided values.
-  const BoardBorder({required this.color, required this.width});
-
-  /// Color of the border
-  final Color color;
-
-  /// Width of the border
-  final double width;
+class BoardPreferences() extends Notifier<BoardPrefs> with PreferencesStorage<BoardPrefs> {
+  @override
+  @protected
+  PrefCategory get prefCategory => PrefCategory.board;
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
-    return other is BoardBorder && other.color == color && other.width == width;
+  @protected
+  BoardPrefs get defaults => BoardPrefs.defaults;
+
+  @override
+  BoardPrefs fromJson(Map<String, dynamic> json) => BoardPrefs.fromJson(json);
+
+  @override
+  BoardPrefs build() {
+    return fetch();
   }
 
-  @override
-  int get hashCode => Object.hash(color, width);
+  Future<void> setPieceSet(PieceSet pieceSet) {
+    return save(state.copyWith(pieceSet: pieceSet));
+  }
 
-  BoardBorder copyWith({Color? color, double? width}) {
-    return BoardBorder(color: color ?? this.color, width: width ?? this.width);
+  Future<void> setBoardTheme(BoardTheme boardTheme) async {
+    await save(state.copyWith(boardTheme: boardTheme));
+  }
+
+  Future<void> togglePremoves() async {
+    await save(state.copyWith(premoves: !state.premoves));
+  }
+
+  Future<void> toggleConfirmResignAndDraw() async {
+    await save(state.copyWith(confirmResignAndDraw: !state.confirmResignAndDraw));
+  }
+
+  Future<void> setPieceShiftMethod(PieceShiftMethod pieceShiftMethod) async {
+    await save(state.copyWith(pieceShiftMethod: pieceShiftMethod));
+  }
+
+  Future<void> toggleMoveOnRelease() async {
+    await save(state.copyWith(moveOnRelease: !state.moveOnRelease));
+  }
+
+  Future<void> setCastlingMethod(CastlingMethod castlingMethod) {
+    return save(state.copyWith(castlingMethod: castlingMethod));
+  }
+
+  Future<void> toggleHapticFeedback() {
+    return save(state.copyWith(hapticFeedback: !state.hapticFeedback));
+  }
+
+  Future<void> toggleImmersiveModeWhilePlaying() {
+    return save(
+      state.copyWith(immersiveModeWhilePlaying: !(state.immersiveModeWhilePlaying ?? false)),
+    );
+  }
+
+  Future<void> toggleShowLegalMoves() {
+    return save(state.copyWith(showLegalMoves: !state.showLegalMoves));
+  }
+
+  Future<void> toggleBoardHighlights() {
+    return save(state.copyWith(boardHighlights: !state.boardHighlights));
+  }
+
+  Future<void> toggleCoordinates() {
+    return save(state.copyWith(coordinates: !state.coordinates));
+  }
+
+  Future<void> toggleBorder() {
+    return save(state.copyWith(showBorder: !state.showBorder));
+  }
+
+  Future<void> togglePieceAnimation() {
+    return save(state.copyWith(pieceAnimation: !state.pieceAnimation));
+  }
+
+  Future<void> toggleMagnifyDraggedPiece() {
+    return save(state.copyWith(magnifyDraggedPiece: !state.magnifyDraggedPiece));
+  }
+
+  Future<void> setDragTargetKind(DragTargetKind dragTargetKind) {
+    return save(state.copyWith(dragTargetKind: dragTargetKind));
+  }
+
+  Future<void> setMaterialDifferenceFormat(MaterialDifferenceFormat materialDifferenceFormat) {
+    return save(state.copyWith(materialDifferenceFormat: materialDifferenceFormat));
+  }
+
+  Future<void> setClockPosition(ClockPosition clockPosition) {
+    return save(state.copyWith(clockPosition: clockPosition));
+  }
+
+  Future<void> setLandscapeBoardPosition(LandscapeBoardPosition landscapeBoardPosition) {
+    return save(state.copyWith(landscapeBoardPosition: landscapeBoardPosition));
+  }
+
+  Future<void> toggleMoveListDisplay() {
+    return save(state.copyWith(moveListDisplay: !state.moveListDisplay));
+  }
+
+  Future<void> toggleEnableShapeDrawings() {
+    return save(state.copyWith(enableShapeDrawings: !state.enableShapeDrawings));
+  }
+
+  Future<void> setShapeColor(ShapeColor shapeColor) {
+    return save(state.copyWith(shapeColor: shapeColor));
+  }
+
+  Future<void> adjustColors({double? brightness, double? hue}) {
+    return save(state.copyWith(brightness: brightness ?? state.brightness, hue: hue ?? state.hue));
   }
 }
 
-/// Board settings that controls visual aspects and behavior of the board.
-///
-/// This is meant for fixed settings that don't change during a game. Sensible defaults are
-/// provided.
-@immutable
-class ChessboardSettings {
-  const ChessboardSettings({
-    // theme
-    this.colorScheme = ChessboardColorScheme.green,
-    this.pieceAssets = PieceSet.cburnettAssets,
-    // visual settings
-    this.border,
-    this.borderRadius = BorderRadius.zero,
-    this.boxShadow = const <BoxShadow>[],
-    this.brightness = 1.0,
-    this.hue = 0.0,
-    this.enableCoordinates = true,
-    this.animationDuration = const Duration(milliseconds: 250),
-    this.showLastMove = true,
-    this.showValidMoves = true,
-    this.blindfoldMode = false,
-    this.dragFeedbackScale = 2.0,
-    this.dragFeedbackOffset = const Offset(0.0, -1.0),
-    this.dragTargetKind = DragTargetKind.circle,
-    this.pieceOrientationBehavior = PieceOrientationBehavior.facingUser,
+@Freezed(fromJson: true, toJson: true)
+sealed class const BoardPrefs._() with _$BoardPrefs implements Serializable {
+  @Assert('brightness >= 0.2 && brightness <= 1.4, hue >= 0.0 && hue <= 360.0')
+  const factory({
+    @JsonKey(defaultValue: PieceSet.cburnett, unknownEnumValue: PieceSet.cburnett)
+    required PieceSet pieceSet,
+    @JsonKey(defaultValue: BoardTheme.green, unknownEnumValue: BoardTheme.green)
+    required BoardTheme boardTheme,
+    bool? immersiveModeWhilePlaying,
+    required bool hapticFeedback,
+    required bool showLegalMoves,
+    required bool boardHighlights,
+    required bool coordinates,
+    required bool pieceAnimation,
+    @JsonKey(
+      defaultValue: MaterialDifferenceFormat.materialDifference,
+      unknownEnumValue: MaterialDifferenceFormat.materialDifference,
+    )
+    required MaterialDifferenceFormat materialDifferenceFormat,
+    @JsonKey(defaultValue: ClockPosition.right, unknownEnumValue: ClockPosition.right)
+    required ClockPosition clockPosition,
+    @JsonKey(
+      defaultValue: LandscapeBoardPosition.left,
+      unknownEnumValue: LandscapeBoardPosition.left,
+    )
+    required LandscapeBoardPosition landscapeBoardPosition,
+    @JsonKey(defaultValue: PieceShiftMethod.either, unknownEnumValue: PieceShiftMethod.either)
+    required PieceShiftMethod pieceShiftMethod,
+    @JsonKey(defaultValue: false) required bool moveOnRelease,
+    @JsonKey(
+      defaultValue: CastlingMethod.kingOverRook,
+      unknownEnumValue: CastlingMethod.kingOverRook,
+    )
+    required CastlingMethod castlingMethod,
+    @JsonKey(defaultValue: true) required bool moveListDisplay,
+    @JsonKey(defaultValue: true) required bool premoves,
+    @JsonKey(defaultValue: true) required bool confirmResignAndDraw,
 
-    // shape drawing
-    this.drawShape = const DrawShapeOptions(),
+    /// Whether to enable shape drawings on the board for games and puzzles.
+    @JsonKey(defaultValue: true) required bool enableShapeDrawings,
+    @JsonKey(defaultValue: true) required bool magnifyDraggedPiece,
+    @JsonKey(defaultValue: DragTargetKind.circle, unknownEnumValue: DragTargetKind.circle)
+    required DragTargetKind dragTargetKind,
+    @JsonKey(defaultValue: ShapeColor.green, unknownEnumValue: ShapeColor.green)
+    required ShapeColor shapeColor,
+    @JsonKey(defaultValue: false) required bool showBorder,
+    @JsonKey(defaultValue: kBoardDefaultBrightnessFilter) required double brightness,
+    @JsonKey(defaultValue: kBoardDefaultHueFilter) required double hue,
+  }) = _BoardPrefs;
 
-    // behavior settings
-    this.enableDrops = false,
-    this.enablePremoves = true,
-    this.enablePremoveCastling = true,
-    this.autoQueenPromotion = false,
-    this.autoQueenPromotionOnPremove = true,
-    this.pieceShiftMethod = PieceShiftMethod.either,
-    this.moveOnRelease = false,
-    this.canPromoteToKing = false,
-  });
+  static const defaults = BoardPrefs(
+    pieceSet: PieceSet.cburnett,
+    boardTheme: BoardTheme.green,
+    immersiveModeWhilePlaying: false,
+    hapticFeedback: true,
+    showLegalMoves: true,
+    boardHighlights: true,
+    coordinates: true,
+    pieceAnimation: true,
+    materialDifferenceFormat: MaterialDifferenceFormat.materialDifference,
+    clockPosition: ClockPosition.right,
+    landscapeBoardPosition: LandscapeBoardPosition.left,
+    moveListDisplay: true,
+    premoves: true,
+    confirmResignAndDraw: true,
+    pieceShiftMethod: PieceShiftMethod.either,
+    moveOnRelease: false,
+    castlingMethod: CastlingMethod.kingOverRook,
+    enableShapeDrawings: true,
+    magnifyDraggedPiece: true,
+    dragTargetKind: DragTargetKind.circle,
+    shapeColor: ShapeColor.green,
+    showBorder: false,
+    brightness: kBoardDefaultBrightnessFilter,
+    hue: kBoardDefaultHueFilter,
+  );
 
-  /// Theme of the board
-  final ChessboardColorScheme colorScheme;
+  bool get hasColorAdjustments =>
+      brightness != kBoardDefaultBrightnessFilter || hue != kBoardDefaultHueFilter;
 
-  /// Piece set
-  final PieceAssets pieceAssets;
-
-  /// Optional border of the board
-  final BoardBorder? border;
-
-  /// Border radius of the board
-  final BorderRadiusGeometry borderRadius;
-
-  /// Box shadow of the board
-  final List<BoxShadow> boxShadow;
-
-  /// Brightness adjustment of the board
-  ///
-  /// A value under 1.0 darkens the board, while a value over 1.0 brightens it.
-  /// A value of 0.0 will make it completely black. Default value is 1.0.
-  final double brightness;
-
-  /// Hue rotation of the board as an angle in degree from 0.0 to 360.0.
-  ///
-  /// A value of 0.0 leaves the hue unchanged. Default value is 0.0.
-  final double hue;
-
-  /// Whether to show board coordinates
-  final bool enableCoordinates;
-
-  /// Piece animation duration
-  final Duration animationDuration;
-
-  /// Whether to show last move highlight
-  final bool showLastMove;
-
-  /// Whether to show valid moves
-  final bool showValidMoves;
-
-  /// Pieces are hidden in blindfold mode
-  final bool blindfoldMode;
-
-  // Scale up factor for the piece currently under drag
-  final double dragFeedbackScale;
-
-  // Offset for the piece currently under drag
-  final Offset dragFeedbackOffset;
-
-  /// The kind of drag target highlight when dragging a piece
-  final DragTargetKind dragTargetKind;
-
-  /// Controls if any pieces are displayed upside down.
-  final PieceOrientationBehavior pieceOrientationBehavior;
-
-  /// Whether drop moves are enabled (for variants such as Crazyhouse).
-  final bool enableDrops;
-
-  /// Whether premoves are enabled.
-  final bool enablePremoves;
-
-  /// Whether castling is enabled with a premove.
-  final bool enablePremoveCastling;
-
-  /// If true the promotion selector won't appear and pawn will be promoted
-  /// automatically to queen.
-  final bool autoQueenPromotion;
-
-  /// If true the promotion selector won't appear and pawn will be promoted
-  /// automatically to queen only if the premove is confirmed
-  final bool autoQueenPromotionOnPremove;
-
-  /// Controls how moves are made.
-  final PieceShiftMethod pieceShiftMethod;
-
-  /// Whether a tap-to-move (selecting a piece, then a destination) is triggered
-  /// when the pointer is released rather than when it is pressed.
-  ///
-  /// By default (`false`) the move is made as soon as the destination square is
-  /// touched. When set to `true`, after a piece has been selected, touching a
-  /// square only arms the move: the user can slide their finger to change the
-  /// destination, and the move is committed on the square where the pointer is
-  /// released. A square target follows the finger while choosing, like when
-  /// dragging a piece but without the piece, and uses [dragTargetKind].
-  ///
-  /// This has no effect on drag-and-drop, which always commits on release.
-  final bool moveOnRelease;
-
-  /// Whether the pawn can be promoted to a king (for example in Antichess).
-  final bool canPromoteToKing;
-
-  /// Options that control the shape drawing gesture (enable/disable and color).
-  ///
-  /// Drawn shapes are stored in [ChessboardController] and can be cleared with
-  /// [ChessboardController.clearDrawnShapes].
-  final DrawShapeOptions drawShape;
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
-    return other is ChessboardSettings &&
-        other.colorScheme == colorScheme &&
-        other.pieceAssets == pieceAssets &&
-        other.border == border &&
-        other.borderRadius == borderRadius &&
-        other.boxShadow == boxShadow &&
-        other.brightness == brightness &&
-        other.hue == hue &&
-        other.enableCoordinates == enableCoordinates &&
-        other.animationDuration == animationDuration &&
-        other.showLastMove == showLastMove &&
-        other.showValidMoves == showValidMoves &&
-        other.blindfoldMode == blindfoldMode &&
-        other.dragFeedbackScale == dragFeedbackScale &&
-        other.dragFeedbackOffset == dragFeedbackOffset &&
-        other.dragTargetKind == dragTargetKind &&
-        other.pieceOrientationBehavior == pieceOrientationBehavior &&
-        other.enableDrops == enableDrops &&
-        other.enablePremoves == enablePremoves &&
-        other.enablePremoveCastling == enablePremoveCastling &&
-        other.autoQueenPromotion == autoQueenPromotion &&
-        other.autoQueenPromotionOnPremove == autoQueenPromotionOnPremove &&
-        other.pieceShiftMethod == pieceShiftMethod &&
-        other.moveOnRelease == moveOnRelease &&
-        other.canPromoteToKing == canPromoteToKing &&
-        other.drawShape == drawShape;
-  }
-
-  @override
-  int get hashCode => Object.hashAll([
-    colorScheme,
-    pieceAssets,
-    border,
-    borderRadius,
-    boxShadow,
-    brightness,
-    hue,
-    enableCoordinates,
-    animationDuration,
-    showLastMove,
-    showValidMoves,
-    blindfoldMode,
-    dragFeedbackScale,
-    dragFeedbackOffset,
-    dragTargetKind,
-    pieceOrientationBehavior,
-    enableDrops,
-    enablePremoves,
-    enablePremoveCastling,
-    autoQueenPromotion,
-    autoQueenPromotionOnPremove,
-    pieceShiftMethod,
-    moveOnRelease,
-    canPromoteToKing,
-    drawShape,
-  ]);
-
-  ChessboardSettings copyWith({
-    ChessboardColorScheme? colorScheme,
-    double? brightness,
-    double? hue,
-    PieceAssets? pieceAssets,
-    BoardBorder? border,
-    BorderRadiusGeometry? borderRadius,
-    List<BoxShadow>? boxShadow,
-    bool? enableCoordinates,
-    Duration? animationDuration,
-    bool? showLastMove,
-    bool? showValidMoves,
-    bool? blindfoldMode,
-    double? dragFeedbackScale,
-    Offset? dragFeedbackOffset,
-    DragTargetKind? dragTargetKind,
-    PieceOrientationBehavior? pieceOrientationBehavior,
-    bool? enableDrops,
-    bool? enablePremoves,
-    bool? enablePremoveCastling,
-    bool? autoQueenPromotion,
-    bool? autoQueenPromotionOnPremove,
-    PieceShiftMethod? pieceShiftMethod,
-    bool? moveOnRelease,
-    bool? canPromoteToKing,
-    DrawShapeOptions? drawShape,
-  }) {
+  ChessboardSettings toBoardSettings(Variant variant) {
     return ChessboardSettings(
-      colorScheme: colorScheme ?? this.colorScheme,
-      brightness: brightness ?? this.brightness,
-      hue: hue ?? this.hue,
-      pieceAssets: pieceAssets ?? this.pieceAssets,
-      border: border ?? this.border,
-      borderRadius: borderRadius ?? this.borderRadius,
-      boxShadow: boxShadow ?? this.boxShadow,
-      enableCoordinates: enableCoordinates ?? this.enableCoordinates,
-      animationDuration: animationDuration ?? this.animationDuration,
-      showLastMove: showLastMove ?? this.showLastMove,
-      showValidMoves: showValidMoves ?? this.showValidMoves,
-      blindfoldMode: blindfoldMode ?? this.blindfoldMode,
-      dragFeedbackScale: dragFeedbackScale ?? this.dragFeedbackScale,
-      dragFeedbackOffset: dragFeedbackOffset ?? this.dragFeedbackOffset,
-      dragTargetKind: dragTargetKind ?? this.dragTargetKind,
-      pieceOrientationBehavior: pieceOrientationBehavior ?? this.pieceOrientationBehavior,
-      enableDrops: enableDrops ?? this.enableDrops,
-      enablePremoves: enablePremoves ?? this.enablePremoves,
-      enablePremoveCastling: enablePremoveCastling ?? this.enablePremoveCastling,
-      autoQueenPromotionOnPremove: autoQueenPromotionOnPremove ?? this.autoQueenPromotionOnPremove,
-      autoQueenPromotion: autoQueenPromotion ?? this.autoQueenPromotion,
-      pieceShiftMethod: pieceShiftMethod ?? this.pieceShiftMethod,
-      moveOnRelease: moveOnRelease ?? this.moveOnRelease,
-      canPromoteToKing: canPromoteToKing ?? this.canPromoteToKing,
-      drawShape: drawShape ?? this.drawShape,
+      pieceAssets: pieceSet.assets,
+      colorScheme: boardTheme.colors,
+      brightness: brightness,
+      hue: hue,
+      border: showBorder
+          ? BoardBorder(color: darken(boardTheme.colors.darkSquare, 0.2), width: 16.0)
+          : null,
+      showValidMoves: showLegalMoves,
+      showLastMove: boardHighlights,
+      enableCoordinates: coordinates,
+      animationDuration: pieceAnimationDuration,
+      dragFeedbackScale: magnifyDraggedPiece ? 2.0 : 1.0,
+      dragFeedbackOffset: Offset(0.0, magnifyDraggedPiece ? -1.0 : 0.0),
+      dragTargetKind: dragTargetKind,
+      pieceShiftMethod: pieceShiftMethod,
+      moveOnRelease: moveOnRelease,
+      drawShape: DrawShapeOptions(enable: enableShapeDrawings, newShapeColor: shapeColor.color),
+      enableDrops: variant == Variant.crazyhouse,
+      canPromoteToKing: variant == Variant.antichess,
     );
   }
+
+  factory fromJson(Map<String, dynamic> json) {
+    return _$BoardPrefsFromJson(json);
+  }
+
+  Duration get pieceAnimationDuration =>
+      pieceAnimation ? const Duration(milliseconds: 150) : Duration.zero;
 }
 
-/// Visual settings for a [StaticChessboard].
-///
-/// This is the non-interactive counterpart of [ChessboardSettings]: it exposes
-/// only the options that are meaningful for a board the user cannot play on
-/// (no premoves, drag, promotion, shift method, etc.).
-///
-/// Use [StaticChessboardSettings.fromBoardSettings] to derive one from an
-/// existing [ChessboardSettings].
-@immutable
-class StaticChessboardSettings {
-  const StaticChessboardSettings({
-    this.colorScheme = ChessboardColorScheme.green,
-    this.pieceAssets = PieceSet.cburnettAssets,
-    this.border,
-    this.borderRadius = BorderRadius.zero,
-    this.boxShadow = const <BoxShadow>[],
-    this.brightness = 1.0,
-    this.hue = 0.0,
-    this.enableCoordinates = false,
-    this.animationDuration = const Duration(milliseconds: 200),
-    this.showLastMove = true,
-    this.blindfoldMode = false,
-    this.pieceOrientationBehavior = PieceOrientationBehavior.facingUser,
-  });
+/// Colors taken from lila: https://github.com/lichess-org/chessground/blob/54a7e71bf88701c1109d3b9b8106b464012b94cf/src/state.ts#L178
+enum ShapeColor() {
+  green,
+  red,
+  blue,
+  yellow;
 
-  /// Derives static settings from a full [ChessboardSettings], keeping only the
-  /// options relevant to a non-interactive board.
-  factory StaticChessboardSettings.fromBoardSettings(ChessboardSettings settings) {
-    return StaticChessboardSettings(
-      colorScheme: settings.colorScheme,
-      pieceAssets: settings.pieceAssets,
-      border: settings.border,
-      borderRadius: settings.borderRadius,
-      boxShadow: settings.boxShadow,
-      brightness: settings.brightness,
-      hue: settings.hue,
-      enableCoordinates: settings.enableCoordinates,
-      animationDuration: settings.animationDuration,
-      showLastMove: settings.showLastMove,
-      blindfoldMode: settings.blindfoldMode,
-      pieceOrientationBehavior: settings.pieceOrientationBehavior,
-    );
-  }
-
-  /// Theme of the board
-  final ChessboardColorScheme colorScheme;
-
-  /// Piece set
-  final PieceAssets pieceAssets;
-
-  /// Optional border of the board
-  final BoardBorder? border;
-
-  /// Border radius of the board
-  final BorderRadiusGeometry borderRadius;
-
-  /// Box shadow of the board
-  final List<BoxShadow> boxShadow;
-
-  /// Brightness adjustment of the board
-  final double brightness;
-
-  /// Hue rotation of the board as an angle in degree from 0.0 to 360.0.
-  final double hue;
-
-  /// Whether to show board coordinates
-  final bool enableCoordinates;
-
-  /// Piece animation duration (pieces animate when the position changes)
-  final Duration animationDuration;
-
-  /// Whether to show last move highlight
-  final bool showLastMove;
-
-  /// Pieces are hidden in blindfold mode
-  final bool blindfoldMode;
-
-  /// Controls if any pieces are displayed upside down.
-  final PieceOrientationBehavior pieceOrientationBehavior;
-
-  StaticChessboardSettings copyWith({
-    ChessboardColorScheme? colorScheme,
-    PieceAssets? pieceAssets,
-    BoardBorder? border,
-    BorderRadiusGeometry? borderRadius,
-    List<BoxShadow>? boxShadow,
-    double? brightness,
-    double? hue,
-    bool? enableCoordinates,
-    Duration? animationDuration,
-    bool? showLastMove,
-    bool? blindfoldMode,
-    PieceOrientationBehavior? pieceOrientationBehavior,
-  }) {
-    return StaticChessboardSettings(
-      colorScheme: colorScheme ?? this.colorScheme,
-      pieceAssets: pieceAssets ?? this.pieceAssets,
-      border: border ?? this.border,
-      borderRadius: borderRadius ?? this.borderRadius,
-      boxShadow: boxShadow ?? this.boxShadow,
-      brightness: brightness ?? this.brightness,
-      hue: hue ?? this.hue,
-      enableCoordinates: enableCoordinates ?? this.enableCoordinates,
-      animationDuration: animationDuration ?? this.animationDuration,
-      showLastMove: showLastMove ?? this.showLastMove,
-      blindfoldMode: blindfoldMode ?? this.blindfoldMode,
-      pieceOrientationBehavior: pieceOrientationBehavior ?? this.pieceOrientationBehavior,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-    if (other.runtimeType != runtimeType) {
-      return false;
-    }
-    return other is StaticChessboardSettings &&
-        other.colorScheme == colorScheme &&
-        other.pieceAssets == pieceAssets &&
-        other.border == border &&
-        other.borderRadius == borderRadius &&
-        other.boxShadow == boxShadow &&
-        other.brightness == brightness &&
-        other.hue == hue &&
-        other.enableCoordinates == enableCoordinates &&
-        other.animationDuration == animationDuration &&
-        other.showLastMove == showLastMove &&
-        other.blindfoldMode == blindfoldMode &&
-        other.pieceOrientationBehavior == pieceOrientationBehavior;
-  }
-
-  @override
-  int get hashCode => Object.hashAll([
-    colorScheme,
-    pieceAssets,
-    border,
-    borderRadius,
-    boxShadow,
-    brightness,
-    hue,
-    enableCoordinates,
-    animationDuration,
-    showLastMove,
-    blindfoldMode,
-    pieceOrientationBehavior,
-  ]);
+  Color get color => Color(switch (this) {
+    ShapeColor.green => 0x15781B,
+    ShapeColor.red => 0x882020,
+    ShapeColor.blue => 0x003088,
+    ShapeColor.yellow => 0xe68f00,
+  }).withAlpha(0xAA);
 }
+
+/// The chessboard theme.
+enum BoardTheme(final String label, final String gifApiName, final Color light, final Color dark) {
+  green('Green', 'green', Color(0xffffffdd), Color(0xff86a666)),
+  pink('Pink', 'pink', Color(0xfff4f0f0), Color(0xffec93a6)),
+  midnight('Midnight', 'blue', Color(0xff9aa5b8), Color(0xff3e4a63)),
+  classic('Classic', 'brown', Color(0xfff0d9b6), Color(0xffb58863)),
+  lavender('Lavender', 'purple', Color(0xffffffff), Color(0xff8e7cc3));
+
+  static final _cache = <BoardTheme, ChessboardColorScheme>{};
+
+  ChessboardColorScheme get colors => this == BoardTheme.green
+      ? ChessboardColorScheme.green
+      : _cache.putIfAbsent(this, () => ChessboardColorScheme.solid(light: light, dark: dark));
+
+  Widget get thumbnail => SizedBox(
+    height: 44,
+    width: 44 * 6,
+    child: Row(
+      children: [
+        for (final c in const [1, 2, 3, 4, 5, 6])
+          Container(width: 44, color: c.isEven ? colors.darkSquare : colors.lightSquare),
+      ],
+    ),
+  );
+}
+
+enum MaterialDifferenceFormat() {
+  materialDifference,
+  capturedPieces,
+  hidden;
+
+  bool get visible => this != MaterialDifferenceFormat.hidden;
+
+  String l10n(AppLocalizations l10n) => switch (this) {
+    MaterialDifferenceFormat.materialDifference => l10n.preferencesMaterialDifference,
+    MaterialDifferenceFormat.capturedPieces => l10n.mobileSettingsMaterialDifferenceCapturedPieces,
+    MaterialDifferenceFormat.hidden => l10n.puzzleHidden, // should be good to reuse this
+  };
+}
+
+enum ClockPosition() {
+  left,
+  right;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    ClockPosition.left => l10n.mobilePositionLeft,
+    ClockPosition.right => l10n.mobilePositionRight,
+  };
+}
+
+enum LandscapeBoardPosition() {
+  left,
+  right;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    LandscapeBoardPosition.left => l10n.mobilePositionLeft,
+    LandscapeBoardPosition.right => l10n.mobilePositionRight,
+  };
+}
+
+enum CastlingMethod() {
+  /// Allow castling by moving either the king over the rook or two squares (to match lichess website).
+  kingOverRook,
+
+  /// Allow castling only by moving the king two squares.
+  kingTwoSquares;
+
+  String l10n(AppLocalizations l10n) => switch (this) {
+    CastlingMethod.kingOverRook => l10n.preferencesCastleByMovingOntoTheRook,
+    CastlingMethod.kingTwoSquares => l10n.preferencesCastleByMovingTwoSquares,
+  };
+}
+
+String dragTargetKindLabel(AppLocalizations l10n, DragTargetKind kind) => switch (kind) {
+  DragTargetKind.circle => l10n.mobileSettingsDraggedTargetCircle,
+  DragTargetKind.square => l10n.mobileSettingsDraggedTargetSquare,
+  DragTargetKind.none => l10n.none,
+};
