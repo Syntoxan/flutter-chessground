@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
   meta: ^1.18.0
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -25,5 +25,3 @@ dev_dependencies:
 flutter:
   assets:
     - assets/piece_sets/syntoxan/
-    - assets/boards/
-    
