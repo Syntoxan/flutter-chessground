@@ -17,31 +17,31 @@ class ChessboardColorScheme {
     required this.validPremoves,
   });
 
-  const ChessboardColorScheme.solid({
+    const ChessboardColorScheme.solid({
     required Color light,
     required Color dark,
   }) : this(
          lightSquare: light,
          darkSquare: dark,
-         background: SolidColorChessboardBackground(
+         background: const SolidColorChessboardBackground(
            lightSquare: light,
            darkSquare: dark,
          ),
-         whiteCoordBackground: SolidColorChessboardBackground(
+         whiteCoordBackground: const SolidColorChessboardBackground(
            lightSquare: light,
            darkSquare: dark,
            coordinates: true,
          ),
-         blackCoordBackground: SolidColorChessboardBackground(
+         blackCoordBackground: const SolidColorChessboardBackground(
            lightSquare: light,
            darkSquare: dark,
            coordinates: true,
            orientation: Side.black,
          ),
-         lastMove: HighlightDetails(solidColor: Color(0x809cc700)),
-         selected: HighlightDetails(solidColor: Color(0x6014551e)),
-         validMoves: Color(0x4014551e),
-         validPremoves: Color(0x40203085),
+         lastMove: const HighlightDetails(solidColor: Color(0x809cc700)),
+         selected: const HighlightDetails(solidColor: Color(0x6014551e)),
+         validMoves: const Color(0x4014551e),
+         validPremoves: const Color(0x40203085),
        );
 
   final Color lightSquare;
