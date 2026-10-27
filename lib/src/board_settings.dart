@@ -80,7 +80,7 @@ class BoardBorder {
 class ChessboardSettings {
   const ChessboardSettings({
     // theme
-    this.colorScheme = ChessboardColorScheme.brown,
+    this.colorScheme = ChessboardColorScheme.green,
     this.pieceAssets = PieceSet.cburnettAssets,
     // visual settings
     this.border,
@@ -340,7 +340,7 @@ class ChessboardSettings {
 @immutable
 class StaticChessboardSettings {
   const StaticChessboardSettings({
-    this.colorScheme = ChessboardColorScheme.brown,
+    this.colorScheme = ChessboardColorScheme.green,
     this.pieceAssets = PieceSet.cburnettAssets,
     this.border,
     this.borderRadius = BorderRadius.zero,
