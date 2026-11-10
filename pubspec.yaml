@@ -25,4 +25,3 @@ dev_dependencies:
 flutter:
   assets:
     - assets/piece_sets/syntoxan/
-    - assets/piece_sets/gtavibe/
