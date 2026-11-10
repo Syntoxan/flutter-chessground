@@ -30,4 +30,18 @@ enum PieceSet {
     PieceKind.whiteQueen: AssetImage('$_pieceSetsPath/syntoxan/wQ.webp', package: 'chessground'),
     PieceKind.whiteKing: AssetImage('$_pieceSetsPath/syntoxan/wK.webp', package: 'chessground'),
   };
+    static const PieceAssets gtavibeAssets = {
+    PieceKind.blackRook: AssetImage('$_pieceSetsPath/gtavibe/bR.webp', package: 'chessground'),
+    PieceKind.blackPawn: AssetImage('$_pieceSetsPath/gtavibe/bP.webp', package: 'chessground'),
+    PieceKind.blackKnight: AssetImage('$_pieceSetsPath/gtavibe/bN.webp', package: 'chessground'),
+    PieceKind.blackBishop: AssetImage('$_pieceSetsPath/gtavibe/bB.webp', package: 'chessground'),
+    PieceKind.blackQueen: AssetImage('$_pieceSetsPath/gtavibe/bQ.webp', package: 'chessground'),
+    PieceKind.blackKing: AssetImage('$_pieceSetsPath/gtavibe/bK.webp', package: 'chessground'),
+    PieceKind.whiteRook: AssetImage('$_pieceSetsPath/gtavibe/wR.webp', package: 'chessground'),
+    PieceKind.whitePawn: AssetImage('$_pieceSetsPath/gtavibe/wP.webp', package: 'chessground'),
+    PieceKind.whiteKnight: AssetImage('$_pieceSetsPath/gtavibe/wN.webp', package: 'chessground'),
+    PieceKind.whiteBishop: AssetImage('$_pieceSetsPath/gtavibe/wB.webp', package: 'chessground'),
+    PieceKind.whiteQueen: AssetImage('$_pieceSetsPath/gtavibe/wQ.webp', package: 'chessground'),
+    PieceKind.whiteKing: AssetImage('$_pieceSetsPath/gtavibe/wK.webp', package: 'chessground'),
+  };
 }
