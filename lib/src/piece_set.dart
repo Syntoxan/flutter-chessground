@@ -5,8 +5,7 @@ import 'models.dart';
 const _pieceSetsPath = 'assets/piece_sets';
 
 enum PieceSet {
-  cburnett('Syntoxan', PieceSet.syntoxanAssets),
-  gtavibe('GTA Vibe', PieceSet.gtavibeAssets);
+  cburnett('Syntoxan', PieceSet.syntoxanAssets);
 
   const PieceSet(this.label, this.assets);
 
